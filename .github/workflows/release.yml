@@ -1,0 +1,54 @@
+name: Release
+
+# Publishes novakv to crates.io and cuts a GitHub Release when a version
+# tag is pushed, e.g.:
+#     git tag v1.0.0 && git push origin v1.0.0
+#
+# Requires a `CARGO_REGISTRY_TOKEN` repository secret (a crates.io API
+# token with publish rights). The GitHub Release uses the built-in
+# GITHUB_TOKEN, so no extra secret is needed for that step.
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write # create the GitHub Release
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+    name: publish ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Refuse to publish if the tag (v1.2.3) and the crate version in
+      # core/Cargo.toml have drifted apart - a mismatched tag is almost
+      # always a mistake and crates.io publishes are irreversible.
+      - name: Verify tag matches crate version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          ver="$(cargo metadata --no-deps --format-version 1 \
+                 | jq -r '.packages[] | select(.name == "novakv") | .version')"
+          echo "tag=$tag  crate version=$ver"
+          if [ "$tag" != "$ver" ]; then
+            echo "::error::tag v$tag does not match crate version $ver"
+            exit 1
+          fi
+
+      - name: Test
+        run: cargo test --workspace --locked --all-features
+
+      # Build the package from the include allowlist and upload it. This is
+      # the irreversible step, so it runs only after tests are green.
+      - name: Publish to crates.io
+        run: cargo publish -p novakv --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes

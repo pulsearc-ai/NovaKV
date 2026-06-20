@@ -1,0 +1,49 @@
+[package]
+name = "novakv"
+version = "1.0.0"
+edition = "2021"
+# Minimum supported Rust version: the toolchain we build and release on.
+# The source uses `Option::is_none_or` (stable 1.82), `const { .. }` blocks
+# (1.79) and integer `div_ceil` (1.73), so the floor is 1.82; pinned higher
+# to match our toolchain. Enforced by the `msrv` CI job.
+rust-version = "1.96"
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "An embedded, ordered key-value store for Rust."
+documentation = "https://docs.rs/novakv"
+readme = "README.md"
+keywords = ["key-value", "database", "embedded", "lsm", "storage"]
+categories = ["database-implementations", "data-structures"]
+# Allowlist: only the crate's own source ships in the package. `include`
+# overrides `exclude`, so anything else in the working tree stays out of
+# the tarball. Consumers build the crate with nothing more than what is
+# listed here.
+include = [
+    "/src/**/*.rs",
+    "/benches/**/*.rs",
+    "/Cargo.toml",
+    "/README.md",
+    "/LICENSE-APACHE",
+    "/LICENSE-MIT",
+    "/LICENSE-BSD-3-CLAUSE",
+]
+
+[features]
+default = []
+# Built-in Snappy block compressor. Enable via:
+#     novakv = { ..., features = ["snappy"] }
+# Pulls in the pure-Rust `snap` crate; the default build stays
+# dep-light.
+snappy = ["dep:snap"]
+
+[dependencies]
+snap = { version = "1.1", optional = true }
+
+# Dependency-free latency baseline harness. `harness = false` runs the
+# bench as a plain release-optimized binary (its own `fn main`), so the
+# crate's zero-dependency posture is preserved - no criterion in the
+# tree. Run with `cargo bench -p novakv --bench db_latency`.
+[[bench]]
+name = "db_latency"
+harness = false

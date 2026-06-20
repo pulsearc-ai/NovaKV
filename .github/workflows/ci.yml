@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  test:
+    name: test ${{ matrix.os }} (${{ matrix.features == '' && 'default' || 'all-features' }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        features: ["", "--all-features"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cargo build --workspace --locked ${{ matrix.features }}
+      - name: Test
+        run: cargo test --workspace --locked ${{ matrix.features }}
+
+  msrv:
+    name: msrv (1.96.0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the exact floor declared by `rust-version` in core/Cargo.toml so
+      # newer-than-MSRV language/std features can't sneak in unnoticed.
+      - name: Install Rust 1.96.0
+        run: |
+          rustup toolchain install 1.96.0 --profile minimal
+          rustup default 1.96.0
+      - name: Build
+        run: cargo build --workspace --locked --all-features
+      - name: Test
+        run: cargo test --workspace --locked --all-features
+
+  lint:
+    name: rustfmt + clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add components
+        run: rustup component add rustfmt clippy
+      - name: rustfmt
+        run: cargo fmt --all -- --check
+      - name: clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+  docs:
+    name: doc build
+    runs-on: ubuntu-latest
+    env:
+      RUSTDOCFLAGS: "-D warnings"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build docs
+        run: cargo doc --workspace --all-features --no-deps
+
+  package:
+    name: publish dry-run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Proves the `include` allowlist in core/Cargo.toml yields a tarball
+      # that builds on its own - the gate to clear before `cargo publish`.
+      - name: Verify package builds from include allowlist
+        run: cargo publish -p novakv --locked --all-features --dry-run

@@ -1,0 +1,25 @@
+# Rust build artifacts
+/target
+**/target
+
+# Backtrace / debug output
+*.rs.bk
+
+# Local credentials / environment
+.env
+.env.*
+!.env.example
+
+# IDE / editor state
+/.idea/
+*.iml
+.vscode/
+*.swp
+.env
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Local-only helper crate, excluded from this repository
+/codec/
