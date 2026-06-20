@@ -28,6 +28,7 @@ jobs:
       # core/Cargo.toml have drifted apart - a mismatched tag is almost
       # always a mistake and crates.io publishes are irreversible.
       - name: Verify tag matches crate version
+        id: version
         run: |
           tag="${GITHUB_REF_NAME#v}"
           ver="$(cargo metadata --no-deps --format-version 1 \
@@ -37,13 +38,35 @@ jobs:
             echo "::error::tag v$tag does not match crate version $ver"
             exit 1
           fi
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
 
       - name: Test
         run: cargo test --workspace --locked --all-features
 
+      - name: Check crates.io publication status
+        id: crates_io
+        run: |
+          url="https://crates.io/api/v1/crates/novakv/${{ steps.version.outputs.version }}"
+          code="$(curl -sS -o /tmp/novakv-version.json -w '%{http_code}' \
+            -H 'User-Agent: pulsearc-ai/NovaKV release workflow' "$url")"
+          case "$code" in
+            200)
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              ;;
+            404)
+              echo "published=false" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "::error::unexpected crates.io response: $code"
+              cat /tmp/novakv-version.json
+              exit 1
+              ;;
+          esac
+
       # Build the package from the include allowlist and upload it. This is
       # the irreversible step, so it runs only after tests are green.
       - name: Publish to crates.io
+        if: steps.crates_io.outputs.published != 'true'
         run: cargo publish -p novakv --locked
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
@@ -51,4 +74,9 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "GitHub Release $GITHUB_REF_NAME already exists; skipping."
+          else
+            gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes
+          fi
