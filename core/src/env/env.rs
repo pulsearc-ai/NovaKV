@@ -827,9 +827,10 @@ impl Env for MemEnv {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, unix))]
 mod tests {
     use super::*;
+
     use std::time::{SystemTime, UNIX_EPOCH};
 
     fn unique_temp_path(name: &str) -> PathBuf {
@@ -840,7 +841,6 @@ mod tests {
         std::env::temp_dir().join(format!("novakv-{name}-{}-{nanos}.lock", std::process::id()))
     }
 
-    #[cfg(unix)]
     #[test]
     fn std_lock_file_rejects_a_second_unix_lock_holder() {
         let path = unique_temp_path("std-lock");
