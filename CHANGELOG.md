@@ -37,6 +37,6 @@ Initial release. NovaKV began as a Rust port of
 - Optional Snappy block compression behind the `snappy` feature (pure-Rust
   `snap` crate); the default build pulls in no third-party crates.
 
-[Unreleased]: https://github.com/pulsearc-ai/novakv/compare/v1.0.1...HEAD
-[1.0.1]: https://github.com/pulsearc-ai/novakv/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/pulsearc-ai/novakv/releases/tag/v1.0.0
+[Unreleased]: https://github.com/pulsearc-ai/NovaKV/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/pulsearc-ai/NovaKV/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/pulsearc-ai/NovaKV/releases/tag/v1.0.0

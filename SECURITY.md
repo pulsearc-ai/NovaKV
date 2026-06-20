@@ -16,7 +16,7 @@ issues.**
 
 Instead, use one of the following private channels:
 
-- GitHub's [private vulnerability reporting](https://github.com/pulsearc-ai/novakv/security/advisories/new)
+- GitHub's [private vulnerability reporting](https://github.com/pulsearc-ai/NovaKV/security/advisories/new)
   (preferred), or
 - email **phibberr@pulsearc.ai**.
 

@@ -4,5 +4,5 @@ members = ["core"]
 
 [workspace.package]
 license = "(MIT OR Apache-2.0) AND BSD-3-Clause"
-repository = "https://github.com/pulsearc-ai/novakv"
-homepage = "https://github.com/pulsearc-ai/novakv"
+repository = "https://github.com/pulsearc-ai/NovaKV"
+homepage = "https://github.com/pulsearc-ai/NovaKV"
