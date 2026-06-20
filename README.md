@@ -2,7 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/novakv.svg)](https://crates.io/crates/novakv)
 [![docs.rs](https://img.shields.io/docsrs/novakv)](https://docs.rs/novakv)
-[![license](https://img.shields.io/crates/l/novakv.svg)](#license)
+[![license](https://img.shields.io/badge/license-%28MIT%20OR%20Apache--2.0%29%20AND%20BSD--3--Clause-blue.svg)](#license)
 
 An embedded, ordered key-value store for Rust — by [PulseArc](https://github.com/pulsearc-ai).
 

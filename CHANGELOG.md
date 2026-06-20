@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-06-20
+
+### Fixed
+
+- Replaced the README license badge with an explicit SPDX badge so it no
+  longer renders as `license: not found` through the unversioned Shields
+  crates.io endpoint.
+
 ## [1.0.0] - 2026-06-19
 
 Initial release. NovaKV began as a Rust port of
@@ -29,5 +37,6 @@ Initial release. NovaKV began as a Rust port of
 - Optional Snappy block compression behind the `snappy` feature (pure-Rust
   `snap` crate); the default build pulls in no third-party crates.
 
-[Unreleased]: https://github.com/pulsearc-ai/novakv/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/pulsearc-ai/novakv/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/pulsearc-ai/novakv/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/pulsearc-ai/novakv/releases/tag/v1.0.0

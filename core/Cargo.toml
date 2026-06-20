@@ -1,6 +1,6 @@
 [package]
 name = "novakv"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 # Minimum supported Rust version: the toolchain we build and release on.
 # The source uses `Option::is_none_or` (stable 1.82), `const { .. }` blocks
